@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>MCA Autumn 2025 — Attendance Tracker (Simplified)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -53,6 +53,71 @@
           width: 100%;
         }
       }
+      @media (max-width: 640px) {
+  .mobile-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .controls-group {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  /* Mobile-optimized table styles */
+  .table-container {
+    margin: 0 -1rem;  /* Negative margin to allow full-width scroll */
+    padding: 0 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-table {
+    font-size: 0.75rem; /* Smaller font on mobile */
+  }
+  
+  .mobile-table th,
+  .mobile-table td {
+    padding: 0.5rem 0.25rem;
+    min-width: 80px; /* Ensure minimum touch target size */
+  }
+  
+  /* Add horizontal scroll indicator */
+  .scroll-indicator {
+    display: none;
+    text-align: center;
+    color: #666;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  @media (max-width: 640px) {
+    .scroll-indicator {
+      display: block;
+    }
+  }
+}
+      /* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .ios-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent pull-to-refresh */
+  html, body {
+    overscroll-behavior-y: none;
+  }
+  
+  /* Fix iOS input zoom */
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
     </style>
   </head>
   <body class="bg-gray-50 text-gray-900 min-h-screen">
@@ -169,10 +234,7 @@
 
       <!-- Timetable -->
       <section class="bg-white rounded-2xl shadow overflow-x-auto">
-        <table
-          class="w-full text-sm text-center table-fixed"
-          id="timetableTable"
-        >
+        <table class="w-full text-sm text-center" id="timetableTable">
           <thead class="bg-gray-900 text-white">
             <tr>
               <th class="p-2 w-24">Day</th>
@@ -184,21 +246,8 @@
               <th class="p-2">02:50–04:50</th>
             </tr>
           </thead>
-          <tbody id="timetable" class="divide-y"></tbody>
+          <tbody id="timetable"></tbody>
         </table>
-        <div class="p-3 text-xs text-gray-500">
-          Legend:
-          <span
-            class="inline-block w-3 h-3 rounded align-middle mr-1"
-            style="background: var(--green)"
-          ></span
-          >Present,
-          <span
-            class="inline-block w-3 h-3 rounded align-middle mr-1"
-            style="background: var(--red)"
-          ></span
-          >Absent
-        </div>
       </section>
 
       <!-- Redesigned Per-Course Cards Only -->
@@ -207,6 +256,70 @@
           📊 Per Course Attendance (All Weeks)
         </h2>
         <div id="courseCards" class="grid grid-cols-1 gap-3"></div>
+      </section>
+
+      <!-- Attendance Planning Table -->
+      <section class="bg-white rounded-2xl shadow p-4 space-y-4 overflow-hidden">
+        <h2 class="text-xl font-semibold">
+          📋 Attendance Planning
+        </h2>
+        <div class="scroll-indicator">← Scroll horizontally →</div>
+        <div class="overflow-x-auto -mx-4 px-4">
+          <table
+            class="w-full text-sm min-w-[640px]"
+          >
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-2 text-left">Course</th>
+                <th class="px-4 py-2 text-center">Current</th>
+                <th class="px-4 py-2 text-center">Remaining Classes</th>
+                <th class="px-4 py-2 text-center">Min. Required</th>
+                <th class="px-4 py-2 text-center">Max. Skippable</th>
+              </tr>
+            </thead>
+            <tbody id="planningTable" class="divide-y"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Semester Settings Section -->
+      <section class="bg-white rounded-2xl shadow p-4 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">⚙️ Semester Settings</h2>
+          <button
+            id="updateSemester"
+            class="px-3 py-2 rounded-xl border bg-white hover:bg-gray-100"
+          >
+            Update
+          </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1"
+              >Semester End Date</label
+            >
+            <input
+              type="date"
+              id="semesterEndDate"
+              class="w-full border rounded-md px-2 py-1"
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Used to calculate remaining classes
+            </p>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Excluded Dates</label>
+            <textarea
+              id="excludedDates"
+              class="w-full border rounded-md px-2 py-1 text-sm"
+              rows="2"
+              placeholder="YYYY-MM-DD, YYYY-MM-DD"
+            ></textarea>
+            <p class="text-xs text-gray-500 mt-1">
+              Holidays/breaks (comma separated)
+            </p>
+          </div>
+        </div>
       </section>
 
       <footer class="text-xs text-gray-500 text-center pb-6">
@@ -276,6 +389,28 @@
         ],
       };
 
+      const computeCourseFrequency = () => {
+  const frequency = {};
+  
+  collectCourseCodes().forEach(code => {
+    frequency[code] = {
+      slots: [],
+      perWeek: 0
+    };
+    
+    DAYS.forEach(day => {
+      TIMETABLE_DATA[day].forEach((courseCode, slotIndex) => {
+        if (courseCode === code) {
+          frequency[code].slots.push(`${day}/${slotIndex}`);
+          frequency[code].perWeek++;
+        }
+      });
+    });
+  });
+  
+  return frequency;
+};
+
       // ===== DOM =====
       const timetableBody = document.getElementById("timetable");
       const courseCards = document.getElementById("courseCards");
@@ -334,26 +469,50 @@
 
       // ===== Render timetable =====
       function renderTimetable() {
-        timetableBody.innerHTML = "";
-        DAYS.forEach((day) => {
-          const tr = document.createElement("tr");
-          const th = document.createElement("th");
-          th.className = "p-2 text-left font-semibold";
-          th.innerHTML = `${day} <div class="text-xs text-gray-400" data-date="${day}"></div>`;
-          tr.appendChild(th);
-          TIMETABLE_DATA[day].forEach((code, slot) => {
-            const td = document.createElement("td");
-            td.className = "cell-btn p-2 border";
-            td.dataset.day = day;
-            td.dataset.slot = slot;
-            td.dataset.code = code;
-            td.dataset.title = COURSES[code] || code;
-            td.textContent = code;
-            tr.appendChild(td);
-          });
-          timetableBody.appendChild(tr);
+    const timetableBody = document.getElementById("timetable");
+    
+    if (!timetableBody) {
+        console.error('Timetable body element not found!');
+        return;
+    }
+
+    // Clear existing content
+    timetableBody.innerHTML = '';
+
+    // Create rows for each day
+    DAYS.forEach(day => {
+        // Create row
+        const row = document.createElement('tr');
+        
+        // Add day cell
+        const dayCell = document.createElement('th');
+        dayCell.className = 'p-2 text-left font-semibold';
+        dayCell.innerHTML = `${day} <div class="text-xs text-gray-400" data-date="${day}"></div>`;
+        row.appendChild(dayCell);
+
+        // Add cells for each time slot
+        TIMETABLE_DATA[day].forEach((code, slotIndex) => {
+            const cell = document.createElement('td');
+            cell.className = 'cell-btn p-2 border';
+            cell.textContent = code || '—';
+            cell.dataset.day = day;
+            cell.dataset.slot = slotIndex;
+            cell.dataset.code = code;
+            cell.dataset.title = COURSES[code] || code;
+            row.appendChild(cell);
         });
-      }
+
+        timetableBody.appendChild(row);
+    });
+
+    // Debug output
+    const cellCount = timetableBody.querySelectorAll('td[data-day]').length;
+    console.log(`Rendered ${cellCount} timetable cells`);
+    
+    if (cellCount === 0) {
+        console.error('No cells were rendered in the timetable!');
+    }
+}
 
       function setState(cell, state) {
         cell.classList.remove("present", "absent");
@@ -460,7 +619,11 @@
             bg = "bg-amber-50";
           }
           const card = document.createElement("div");
-          card.className = `flex items-center justify-between rounded-xl px-4 py-3 border ${bg}`;
+          card.className = `
+            flex flex-col sm:flex-row items-start sm:items-center 
+            justify-between rounded-xl px-4 py-3 border ${bg}
+            gap-2 sm:gap-0
+          `;
           card.title = COURSES[code] || code;
           const left = document.createElement("div");
           left.className = "font-semibold";
@@ -470,9 +633,167 @@
           right.textContent = `${a}/${t} (${pct}%)`;
           card.appendChild(left);
           card.appendChild(right);
+
+          // Add course name for mobile
+          const details = document.createElement('div');
+          details.className = 'text-xs text-gray-600 mt-1 sm:hidden';
+          details.textContent = COURSES[code] || '';
+          left.appendChild(details);
+
           courseCards.appendChild(card);
         });
+        updateAttendancePlan();
       }
+
+      function computeAttendancePlan() {
+        const { totals, att } = computeCourseTotals();
+        const threshold = Number(thresholdEl.value) / 100;
+        const plan = {};
+        
+        collectCourseCodes().forEach(code => {
+            const attended = att[code] || 0;
+            const total = totals[code] || 0;
+            const remaining = getRemainingClassDays(code) || 0;
+            const totalPossible = total + remaining;
+
+            // Calculate minimum classes needed
+            let minNeeded = Math.ceil(totalPossible * threshold) - attended;
+            minNeeded = Math.max(0, minNeeded);
+
+            // Calculate maximum classes that can be skipped
+            const maxSkippable = Math.max(0, remaining - minNeeded);
+
+            plan[code] = {
+              minNeeded,
+              maxSkippable,
+              remaining,
+              currentAttendance: total ? (attended / total * 100).toFixed(1) : 0,
+              totalPossible
+            };
+          });
+
+        return plan;
+      }
+      function updateAttendancePlan() {
+        const planningTable = document.getElementById('planningTable');
+        const plan = computeAttendancePlan();
+        
+        planningTable.innerHTML = '';
+        
+        Object.entries(plan).forEach(([code, data]) => {
+            const row = document.createElement('tr');
+            
+            const nameCell = document.createElement('td');
+            nameCell.className = 'px-4 py-2';
+            nameCell.innerHTML = `
+              <div class="font-medium">${code}</div>
+              <div class="text-xs text-gray-500">
+                ${COURSES[code]}
+                <div class="mt-1">
+                  ${getFrequencyString(code)} 
+                  • Total Expected: ${data.totalPossible} classes
+                </div>
+              </div>
+            `;
+            
+            const currentCell = document.createElement('td');
+            currentCell.className = 'px-4 py-2 text-center';
+            currentCell.textContent = `${data.currentAttendance}%`;
+            
+            const remainingCell = document.createElement('td');
+            remainingCell.className = 'px-4 py-2 text-center';
+            remainingCell.textContent = data.remaining;
+            
+            const minCell = document.createElement('td');
+            minCell.className = 'px-4 py-2 text-center font-medium';
+            if (data.minNeeded > 0) {
+                minCell.className += ' text-red-600';
+            }
+            minCell.textContent = data.minNeeded;
+            
+            const maxCell = document.createElement('td');
+            maxCell.className = 'px-4 py-2 text-center font-medium';
+            if (data.maxSkippable > 0) {
+                maxCell.className += ' text-green-600';
+            }
+            maxCell.textContent = data.maxSkippable;
+            
+            row.append(nameCell, currentCell, remainingCell, minCell, maxCell);
+            planningTable.appendChild(row);
+        });
+    }
+
+      function getFrequencyString(code) {
+  const frequency = computeCourseFrequency()[code];
+  return `${frequency.perWeek} classes/week`;
+}
+
+      // ===== Semester Settings =====
+      function saveSemesterSettings() {
+  const settings = {
+    endDate: document.getElementById('semesterEndDate').value,
+    excludedDates: document.getElementById('excludedDates').value
+      .split(',')
+      .map(d => d.trim())
+      .filter(d => d.length > 0)
+  };
+  
+  const errors = validateSemesterSettings(settings);
+  if (errors.length > 0) {
+    alert(`Please fix the following:\n\n${errors.join('\n')}`);
+    return false;
+  }
+  
+  localStorage.setItem('SEMESTER_SETTINGS', JSON.stringify(settings));
+  updateCourseCards();
+  return true;
+}
+
+function loadSemesterSettings() {
+  try {
+    const settings = JSON.parse(localStorage.getItem('SEMESTER_SETTINGS')) || {};
+    document.getElementById('semesterEndDate').value = settings.endDate || '';
+    document.getElementById('excludedDates').value = (settings.excludedDates || []).join(', ');
+    return settings;
+  } catch {
+    return { endDate: '', excludedDates: [] };
+  }
+}
+
+function getRemainingClassDays(code) {
+  const settings = loadSemesterSettings();
+  if (!settings.endDate) return null;
+
+  const endDate = parseDateLocal(settings.endDate);
+  const today = parseDateLocal(new Date());
+  const excludedDates = new Set(settings.excludedDates);
+  const courseFrequency = computeCourseFrequency()[code];
+  
+  let remainingClasses = 0;
+  let currentDate = today;
+
+  // Validate dates
+  if (endDate <= today) return 0;
+
+  while (currentDate <= endDate) {
+    const dayIndex = currentDate.getDay();
+    const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayIndex];
+    const dateStr = fmtDate(currentDate);
+
+    // Skip if:
+    // 1. It's a weekend (Sunday = 0, Saturday = 6)
+    // 2. It's in excluded dates
+    if (dayIndex !== 0 && dayIndex !== 6 && !excludedDates.has(dateStr)) {
+      // Count actual classes on this day based on timetable
+      const classesOnThisDay = TIMETABLE_DATA[dayName]?.filter(c => c === code).length || 0;
+      remainingClasses += classesOnThisDay;
+    }
+    
+    currentDate = addDays(currentDate, 1);
+  }
+
+  return remainingClasses;
+}
 
       // ===== Filter =====
       function populateFilter() {
@@ -554,18 +875,83 @@
       document
         .getElementById("printReport")
         .addEventListener("click", () => window.print());
+      document.getElementById('updateSemester').addEventListener('click', () => {
+  saveSemesterSettings();
+  updateCourseCards(); // This will also update the planning table
+});
 
-      // ===== Boot =====
-      (function init() {
-        renderTimetable();
-        wireCells();
-        populateFilter();
-        // default to current week's Monday
-        const mon = getMonday(new Date());
-        weekPicker.value = fmtDate(mon);
-        applyWeekData(mon);
-        updateCourseCards();
-      })();
+      // Add to script section
+function validateSemesterSettings(settings) {
+  const errors = [];
+  
+  // Check end date
+  if (!settings.endDate) {
+    errors.push("Semester end date is required");
+  } else {
+    const endDate = parseDateLocal(settings.endDate);
+    const today = parseDateLocal(new Date());
+    if (endDate <= today) {
+      errors.push("End date must be in the future");
+    }
+  }
+  
+  // Check excluded dates format
+  const invalidDates = settings.excludedDates.filter(d => !(/^\d{4}-\d{2}-\d{2}$/.test(d)));
+  if (invalidDates.length > 0) {
+    errors.push(`Invalid date format: ${invalidDates.join(', ')}`);
+  }
+  
+  return errors;
+}
+
+// Add to init function
+(function init() {
+    // Debug check for DOM elements
+    console.log('Initializing app...');
+    const requiredElements = {
+        timetable: document.getElementById("timetable"),
+        courseCards: document.getElementById("courseCards"),
+        threshold: document.getElementById("threshold"),
+        weekPicker: document.getElementById("weekPicker")
+    };
+
+    // Check if all required elements exist
+    Object.entries(requiredElements).forEach(([name, element]) => {
+        if (!element) {
+            console.error(`Required element "${name}" not found!`);
+        }
+    });
+
+    // Render timetable first
+    console.log('Rendering timetable...');
+    renderTimetable();
+
+    // Wire up cell interactions
+    console.log('Setting up cell interactions...');
+    wireCells();
+
+    // Initialize other components
+    console.log('Initializing other components...');
+    populateFilter();
+    
+    // Set initial week
+    const mon = getMonday(new Date());
+    weekPicker.value = fmtDate(mon);
+    
+    // Load data
+    applyWeekData(mon);
+    updateCourseCards();
+    loadSemesterSettings();
+
+    console.log('Initialization complete');
+})();
+
+      // Add this debug check right after renderTimetable() is called in init()
+// Add after renderTimetable() in init function
+const cellCount = document.querySelectorAll('#timetable td[data-day]').length;
+if (cellCount === 0) {
+  console.error('Timetable failed to render - no cells found');
+}
     </script>
   </body>
 </html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MCA Autumn 2025 — Attendance Tracker (Simplified)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --green: #bbf7d0;
+        --red: #fee2e2;
+        --amber: #fef3c7;
+      }
+      .present {
+        background: var(--green) !important;
+      }
+      .absent {
+        background: var(--red) !important;
+      }
+      .cell-btn {
+        cursor: pointer;
+        user-select: none;
+      }
+      td[data-code] {
+        position: relative;
+      }
+      td[data-code]:hover::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #111;
+        color: #fff;
+        padding: 4px 6px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        white-space: nowrap;
+        z-index: 10;
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #print-area,
+        #print-area * {
+          visibility: visible;
+        }
+        #print-area {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-gray-900 min-h-screen">
+    <div class="max-w-7xl mx-auto p-6 space-y-6" id="print-area">
+      <header
+        class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
+      >
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold">
+            📚 MCA 1st Semester Attendance — Autumn 2025
+          </h1>
+          <p class="text-sm text-gray-600">
+            Tap cells to mark
+            <span class="font-semibold">Present → Absent → Clear</span>.
+            Library/Advisory are ignored in stats.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="text-sm font-medium"
+            >Threshold
+            <span id="thresholdValue" class="font-semibold">75%</span></label
+          >
+          <input
+            id="threshold"
+            type="range"
+            min="50"
+            max="100"
+            value="75"
+            class="w-44"
+          />
+          <button
+            id="exportData"
+            class="px-3 py-2 rounded-xl border bg-white hover:bg-gray-100"
+          >
+            Export
+          </button>
+          <label
+            class="px-3 py-2 rounded-xl border bg-white hover:bg-gray-100 cursor-pointer"
+          >
+            <input
+              id="importFile"
+              type="file"
+              accept="application/json"
+              class="hidden"
+            />Import
+          </label>
+          <button
+            id="printReport"
+            class="px-3 py-2 rounded-xl border bg-white hover:bg-gray-100"
+          >
+            Print
+          </button>
+        </div>
+      </header>
+
+      <section class="grid gap-3 sm:grid-cols-2 items-end">
+        <div
+          class="bg-white rounded-2xl shadow p-4 flex items-center justify-between gap-3"
+        >
+          <div>
+            <label class="block text-sm font-semibold">Week of (Monday)</label>
+            <input
+              id="weekPicker"
+              type="date"
+              class="mt-1 w-52 border rounded-md px-2 py-1"
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Pick any date — snaps to Monday of that week.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              id="prevWeek"
+              class="px-3 py-2 rounded-xl border hover:bg-gray-100"
+            >
+              ◀︎ Prev
+            </button>
+            <button
+              id="nextWeek"
+              class="px-3 py-2 rounded-xl border hover:bg-gray-100"
+            >
+              Next ▶︎
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-2xl shadow p-4 flex flex-wrap gap-3 items-end"
+        >
+          <div>
+            <label class="block text-sm font-semibold mb-1"
+              >Filter by Course</label
+            >
+            <select id="courseFilter" class="border rounded px-2 py-1 min-w-60">
+              <option value="">All Courses</option>
+            </select>
+          </div>
+          <div class="ml-auto flex gap-2">
+            <button
+              id="clearWeek"
+              class="px-3 py-2 rounded-xl border hover:bg-gray-100"
+            >
+              Clear This Week
+            </button>
+            <button
+              id="clearAll"
+              class="px-3 py-2 rounded-xl border hover:bg-gray-100"
+            >
+              Clear All
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Timetable -->
+      <section class="bg-white rounded-2xl shadow overflow-x-auto">
+        <table
+          class="w-full text-sm text-center table-fixed"
+          id="timetableTable"
+        >
+          <thead class="bg-gray-900 text-white">
+            <tr>
+              <th class="p-2 w-24">Day</th>
+              <th class="p-2">09:10–10:10</th>
+              <th class="p-2">10:10–11:10</th>
+              <th class="p-2">11:10–12:10</th>
+              <th class="p-2">12:10–01:10</th>
+              <th class="p-2">01:50–02:50</th>
+              <th class="p-2">02:50–04:50</th>
+            </tr>
+          </thead>
+          <tbody id="timetable" class="divide-y"></tbody>
+        </table>
+        <div class="p-3 text-xs text-gray-500">
+          Legend:
+          <span
+            class="inline-block w-3 h-3 rounded align-middle mr-1"
+            style="background: var(--green)"
+          ></span
+          >Present,
+          <span
+            class="inline-block w-3 h-3 rounded align-middle mr-1"
+            style="background: var(--red)"
+          ></span
+          >Absent
+        </div>
+      </section>
+
+      <!-- Redesigned Per-Course Cards Only -->
+      <section class="bg-white rounded-2xl shadow p-4 space-y-4">
+        <h2 class="text-xl font-semibold">
+          📊 Per Course Attendance (All Weeks)
+        </h2>
+        <div id="courseCards" class="grid grid-cols-1 gap-3"></div>
+      </section>
+
+      <footer class="text-xs text-gray-500 text-center pb-6">
+        Data auto-saves to your browser (localStorage). Export/Import to move
+        devices.
+      </footer>
+    </div>
+
+    <script>
+      // ===== Core Data =====
+      const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+      const EXCLUDE_CODES = new Set(["LIBRARY", "ADVISORY"]);
+      const COURSES = {
+        MCA501C: "Programming Concepts in C/C++ — Dr. Snowber Mushtaq",
+        MCA502C: "Database Management System — Dr. Syed Mohsin Saif",
+        MCA503C: "Discrete Mathematics — Dr. Muzaffar Rasool Bhat",
+        MCA504C: "Computer Organization & Architecture — Dr. Kaisar Javeed",
+        MCA511E: "Digital Electronics — Dr. Kaisar Javeed",
+        MCA526E: "Web Technologies — Dr. Zubair Jeelani",
+        MCA541A: "Information & Communications Technology — Dr. Kaisar Javeed",
+        "MCA501C-LAB": "Programming in C/C++ (Lab)",
+        "MCA502C-LAB": "Database Management System (Lab)",
+        "MCA526E-LAB": "Web Technologies (Lab)",
+        LIBRARY: "Library Session",
+        ADVISORY: "Advisory Session",
+      };
+      const TIMETABLE_DATA = {
+        Mon: [
+          "MCA504C",
+          "LIBRARY",
+          "MCA526E",
+          "MCA502C",
+          "MCA503C",
+          "MCA502C-LAB",
+        ],
+        Tue: [
+          "MCA511E",
+          "MCA502C",
+          "ADVISORY",
+          "MCA503C",
+          "MCA501C",
+          "MCA501C-LAB",
+        ],
+        Wed: [
+          "MCA511E",
+          "ADVISORY",
+          "MCA504C",
+          "MCA503C",
+          "MCA501C",
+          "MCA502C-LAB",
+        ],
+        Thu: [
+          "MCA526E",
+          "MCA504C",
+          "MCA502C",
+          "MCA541A",
+          "LIBRARY",
+          "MCA501C-LAB",
+        ],
+        Fri: [
+          "MCA541A",
+          "MCA511E",
+          "MCA504C",
+          "MCA503C",
+          "MCA501C",
+          "MCA526E-LAB",
+        ],
+      };
+
+      // ===== DOM =====
+      const timetableBody = document.getElementById("timetable");
+      const courseCards = document.getElementById("courseCards");
+      const thresholdEl = document.getElementById("threshold");
+      const thresholdValue = document.getElementById("thresholdValue");
+      const weekPicker = document.getElementById("weekPicker");
+      const courseFilter = document.getElementById("courseFilter");
+
+      // ===== Utilities =====
+      const pad = (n) => String(n).padStart(2, "0");
+      const fmtDate = (d) =>
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      function parseDateLocal(x) {
+        if (x instanceof Date)
+          return new Date(x.getFullYear(), x.getMonth(), x.getDate());
+        if (typeof x === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x)) {
+          const [y, m, da] = x.split("-").map(Number);
+          return new Date(y, m - 1, da);
+        }
+        const d = new Date();
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      }
+      function getMonday(input) {
+        const d = parseDateLocal(input);
+        const day = d.getDay();
+        const diff = (day + 6) % 7;
+        d.setDate(d.getDate() - diff);
+        d.setHours(0, 0, 0, 0);
+        return d;
+      }
+      function addDays(date, n) {
+        const d = parseDateLocal(date);
+        d.setDate(d.getDate() + n);
+        return d;
+      }
+      const weekKey = (monday) => `MCA_ATTEND_${fmtDate(monday)}`;
+
+      // ===== Persistence =====
+      const loadWeek = (mon) => {
+        try {
+          return JSON.parse(localStorage.getItem(weekKey(mon))) || {};
+        } catch {
+          return {};
+        }
+      };
+      function saveWeek(mon, data) {
+        Object.keys(data).forEach((d) => {
+          if (!data[d] || !Object.keys(data[d]).length) delete data[d];
+        });
+        if (Object.keys(data).length)
+          localStorage.setItem(weekKey(mon), JSON.stringify(data));
+        else localStorage.removeItem(weekKey(mon));
+      }
+      const allWeeks = () =>
+        Object.keys(localStorage).filter((k) => k.startsWith("MCA_ATTEND_"));
+
+      // ===== Render timetable =====
+      function renderTimetable() {
+        timetableBody.innerHTML = "";
+        DAYS.forEach((day) => {
+          const tr = document.createElement("tr");
+          const th = document.createElement("th");
+          th.className = "p-2 text-left font-semibold";
+          th.innerHTML = `${day} <div class="text-xs text-gray-400" data-date="${day}"></div>`;
+          tr.appendChild(th);
+          TIMETABLE_DATA[day].forEach((code, slot) => {
+            const td = document.createElement("td");
+            td.className = "cell-btn p-2 border";
+            td.dataset.day = day;
+            td.dataset.slot = slot;
+            td.dataset.code = code;
+            td.dataset.title = COURSES[code] || code;
+            td.textContent = code;
+            tr.appendChild(td);
+          });
+          timetableBody.appendChild(tr);
+        });
+      }
+
+      function setState(cell, state) {
+        cell.classList.remove("present", "absent");
+        if (state === "present") cell.classList.add("present");
+        if (state === "absent") cell.classList.add("absent");
+        cell.dataset.state = state || "";
+      }
+      function cycleState(cell) {
+        if (cell.classList.contains("present")) setState(cell, "absent");
+        else if (cell.classList.contains("absent")) setState(cell, "");
+        else setState(cell, "present");
+      }
+      function persistCell(cell) {
+        const mon = currentMonday();
+        const data = loadWeek(mon);
+        const d = cell.dataset.day,
+          s = cell.dataset.slot,
+          st = cell.dataset.state || "";
+        if (!data[d]) data[d] = {};
+        if (st) data[d][s] = st;
+        else {
+          delete data[d][s];
+          if (!Object.keys(data[d]).length) delete data[d];
+        }
+        saveWeek(mon, data);
+        updateCourseCards();
+      }
+
+      function applyWeekData(mon) {
+        const data = loadWeek(mon);
+        document.querySelectorAll("#timetable td[data-day]").forEach((td) => {
+          const st = data?.[td.dataset.day]?.[td.dataset.slot] || "";
+          setState(td, st);
+        });
+        DAYS.forEach((d, i) => {
+          const el = document.querySelector(`[data-date="${d}"]`);
+          if (el) el.textContent = fmtDate(addDays(mon, i));
+        });
+      }
+      function currentMonday() {
+        const v = weekPicker.value
+          ? parseDateLocal(weekPicker.value)
+          : new Date();
+        return getMonday(v);
+      }
+      function wireCells() {
+        document.querySelectorAll("#timetable td[data-day]").forEach((td) => {
+          td.addEventListener("click", () => {
+            cycleState(td);
+            persistCell(td);
+          });
+        });
+      }
+
+      // ===== Per-course cards =====
+      function collectCourseCodes() {
+        const set = new Set();
+        DAYS.forEach((d) =>
+          TIMETABLE_DATA[d].forEach((c) => {
+            if (!EXCLUDE_CODES.has(c)) set.add(c);
+          })
+        );
+        return Array.from(set).sort();
+      }
+      function computeCourseTotals() {
+        const totals = {},
+          att = {};
+        collectCourseCodes().forEach((c) => {
+          totals[c] = 0;
+          att[c] = 0;
+        });
+        allWeeks().forEach((k) => {
+          try {
+            const w = JSON.parse(localStorage.getItem(k));
+            DAYS.forEach((d) => {
+              const dayObj = w?.[d] || {};
+              Object.keys(dayObj).forEach((slot) => {
+                const code = TIMETABLE_DATA[d][slot];
+                if (EXCLUDE_CODES.has(code)) return;
+                totals[code] = (totals[code] || 0) + 1;
+                if (dayObj[slot] === "present")
+                  att[code] = (att[code] || 0) + 1;
+              });
+            });
+          } catch {}
+        });
+        return { totals, att };
+      }
+      function updateCourseCards() {
+        const { totals, att } = computeCourseTotals();
+        const threshold = Number(thresholdEl.value);
+        thresholdValue.textContent = `${threshold}%`;
+        courseCards.innerHTML = "";
+        collectCourseCodes().forEach((code) => {
+          const t = totals[code] || 0;
+          const a = att[code] || 0;
+          const pct = t ? Math.round((a / t) * 100) : 0;
+          let bg = "bg-red-50";
+          if (t === 0) {
+            bg = "bg-red-50";
+          } else if (pct >= threshold) {
+            bg = "bg-green-50";
+          } else if (pct >= threshold - 5) {
+            bg = "bg-amber-50";
+          }
+          const card = document.createElement("div");
+          card.className = `flex items-center justify-between rounded-xl px-4 py-3 border ${bg}`;
+          card.title = COURSES[code] || code;
+          const left = document.createElement("div");
+          left.className = "font-semibold";
+          left.textContent = code;
+          const right = document.createElement("div");
+          right.className = "text-sm text-gray-700";
+          right.textContent = `${a}/${t} (${pct}%)`;
+          card.appendChild(left);
+          card.appendChild(right);
+          courseCards.appendChild(card);
+        });
+      }
+
+      // ===== Filter =====
+      function populateFilter() {
+        courseFilter.innerHTML = '<option value="">All Courses</option>';
+        collectCourseCodes().forEach((code) => {
+          const o = document.createElement("option");
+          o.value = code;
+          o.textContent = `${code} — ${COURSES[code] || ""}`;
+          courseFilter.appendChild(o);
+        });
+      }
+      courseFilter.addEventListener("change", () => {
+        const val = courseFilter.value;
+        document.querySelectorAll("#timetable td[data-code]").forEach((td) => {
+          td.style.opacity = !val || td.dataset.code === val ? 1 : 0.25;
+        });
+      });
+
+      // ===== Controls =====
+      thresholdEl.addEventListener("input", updateCourseCards);
+      weekPicker.addEventListener("change", () => {
+        applyWeekData(currentMonday());
+      });
+      document.getElementById("prevWeek").addEventListener("click", () => {
+        const prev = addDays(currentMonday(), -7);
+        weekPicker.value = fmtDate(prev);
+        applyWeekData(prev);
+      });
+      document.getElementById("nextWeek").addEventListener("click", () => {
+        const next = addDays(currentMonday(), 7);
+        weekPicker.value = fmtDate(next);
+        applyWeekData(next);
+      });
+      document.getElementById("clearWeek").addEventListener("click", () => {
+        if (confirm("Clear this week?")) {
+          saveWeek(currentMonday(), {});
+          applyWeekData(currentMonday());
+          updateCourseCards();
+        }
+      });
+      document.getElementById("clearAll").addEventListener("click", () => {
+        if (confirm("Clear ALL weeks?")) {
+          allWeeks().forEach((k) => localStorage.removeItem(k));
+          applyWeekData(currentMonday());
+          updateCourseCards();
+        }
+      });
+      document.getElementById("exportData").addEventListener("click", () => {
+        const all = {};
+        allWeeks().forEach(
+          (k) => (all[k] = JSON.parse(localStorage.getItem(k)))
+        );
+        const blob = new Blob([JSON.stringify(all)], {
+          type: "application/json",
+        });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "attendance_data.json";
+        a.click();
+      });
+      document.getElementById("importFile").addEventListener("change", (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = () => {
+          try {
+            const data = JSON.parse(r.result);
+            Object.keys(data).forEach((k) =>
+              localStorage.setItem(k, JSON.stringify(data[k]))
+            );
+            applyWeekData(currentMonday());
+            updateCourseCards();
+          } catch {
+            alert("Invalid file");
+          }
+        };
+        r.readAsText(f);
+      });
+      document
+        .getElementById("printReport")
+        .addEventListener("click", () => window.print());
+
+      // ===== Boot =====
+      (function init() {
+        renderTimetable();
+        wireCells();
+        populateFilter();
+        // default to current week's Monday
+        const mon = getMonday(new Date());
+        weekPicker.value = fmtDate(mon);
+        applyWeekData(mon);
+        updateCourseCards();
+      })();
+    </script>
+  </body>
+</html>

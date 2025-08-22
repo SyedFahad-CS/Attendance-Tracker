@@ -175,29 +175,29 @@
 
       <section class="grid gap-3 sm:grid-cols-2 items-end">
         <div
-          class="bg-white rounded-2xl shadow p-4 flex items-center justify-between gap-3"
+          class="bg-white rounded-2xl shadow p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between w-full"
         >
-          <div>
+          <div class="w-full">
             <label class="block text-sm font-semibold">Week of (Monday)</label>
             <input
               id="weekPicker"
               type="date"
-              class="mt-1 w-52 border rounded-md px-2 py-1"
+              class="mt-1 w-full sm:w-52 border rounded-md px-2 py-2 text-base"
             />
             <p class="text-xs text-gray-500 mt-1">
               Pick any date — snaps to Monday of that week.
             </p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex gap-2 w-full sm:w-auto">
             <button
               id="prevWeek"
-              class="px-3 py-2 rounded-xl border hover:bg-gray-100"
+              class="px-3 py-2 rounded-xl border hover:bg-gray-100 w-full sm:w-auto"
             >
               ◀︎ Prev
             </button>
             <button
               id="nextWeek"
-              class="px-3 py-2 rounded-xl border hover:bg-gray-100"
+              class="px-3 py-2 rounded-xl border hover:bg-gray-100 w-full sm:w-auto"
             >
               Next ▶︎
             </button>
@@ -205,26 +205,26 @@
         </div>
 
         <div
-          class="bg-white rounded-2xl shadow p-4 flex flex-wrap gap-3 items-end"
+          class="bg-white rounded-2xl shadow p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between w-full"
         >
-          <div>
+          <div class="w-full">
             <label class="block text-sm font-semibold mb-1"
               >Filter by Course</label
             >
-            <select id="courseFilter" class="border rounded px-2 py-1 min-w-60">
+            <select id="courseFilter" class="border rounded px-2 py-2 min-w-full text-base w-full">
               <option value="">All Courses</option>
             </select>
           </div>
-          <div class="ml-auto flex gap-2">
+          <div class="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
             <button
               id="clearWeek"
-              class="px-3 py-2 rounded-xl border hover:bg-gray-100"
+              class="px-3 py-2 rounded-xl border hover:bg-gray-100 w-full sm:w-auto"
             >
               Clear This Week
             </button>
             <button
               id="clearAll"
-              class="px-3 py-2 rounded-xl border hover:bg-gray-100"
+              class="px-3 py-2 rounded-xl border hover:bg-gray-100 w-full sm:w-auto"
             >
               Clear All
             </button>

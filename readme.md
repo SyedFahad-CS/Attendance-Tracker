@@ -98,5 +98,4 @@ Feel free to use, modify, and share!
 
 ## 🙌 Credits
 
-Made with ❤️ for MCA students by [Your Name].  
-Powered
+Made with ❤️ for MCA students by Syed Fahad.  

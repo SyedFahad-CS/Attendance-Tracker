@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
     <title>MCA Autumn 2025 — Attendance Tracker (Simplified)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -54,70 +57,71 @@
         }
       }
       @media (max-width: 640px) {
-  .mobile-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .controls-group {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-  
-  /* Mobile-optimized table styles */
-  .table-container {
-    margin: 0 -1rem;  /* Negative margin to allow full-width scroll */
-    padding: 0 1rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .mobile-table {
-    font-size: 0.75rem; /* Smaller font on mobile */
-  }
-  
-  .mobile-table th,
-  .mobile-table td {
-    padding: 0.5rem 0.25rem;
-    min-width: 80px; /* Ensure minimum touch target size */
-  }
-  
-  /* Add horizontal scroll indicator */
-  .scroll-indicator {
-    display: none;
-    text-align: center;
-    color: #666;
-    padding: 0.5rem;
-    font-size: 0.75rem;
-  }
-  
-  @media (max-width: 640px) {
-    .scroll-indicator {
-      display: block;
-    }
-  }
-}
+        .mobile-header {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .controls-group {
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 0.5rem;
+        }
+
+        /* Mobile-optimized table styles */
+        .table-container {
+          margin: 0 -1rem; /* Negative margin to allow full-width scroll */
+          padding: 0 1rem;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-table {
+          font-size: 0.75rem; /* Smaller font on mobile */
+        }
+
+        .mobile-table th,
+        .mobile-table td {
+          padding: 0.5rem 0.25rem;
+          min-width: 80px; /* Ensure minimum touch target size */
+        }
+
+        /* Add horizontal scroll indicator */
+        .scroll-indicator {
+          display: none;
+          text-align: center;
+          color: #666;
+          padding: 0.5rem;
+          font-size: 0.75rem;
+        }
+
+        @media (max-width: 640px) {
+          .scroll-indicator {
+            display: block;
+          }
+        }
+      }
       /* iOS-specific fixes */
-@supports (-webkit-touch-callout: none) {
-  .ios-scroll {
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Prevent pull-to-refresh */
-  html, body {
-    overscroll-behavior-y: none;
-  }
-  
-  /* Fix iOS input zoom */
-  input[type="text"],
-  input[type="number"],
-  input[type="date"],
-  select,
-  textarea {
-    font-size: 16px;
-  }
-}
+      @supports (-webkit-touch-callout: none) {
+        .ios-scroll {
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* Prevent pull-to-refresh */
+        html,
+        body {
+          overscroll-behavior-y: none;
+        }
+
+        /* Fix iOS input zoom */
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+          font-size: 16px;
+        }
+      }
     </style>
   </head>
   <body class="bg-gray-50 text-gray-900 min-h-screen">
@@ -211,7 +215,10 @@
             <label class="block text-sm font-semibold mb-1"
               >Filter by Course</label
             >
-            <select id="courseFilter" class="border rounded px-2 py-2 min-w-full text-base w-full">
+            <select
+              id="courseFilter"
+              class="border rounded px-2 py-2 min-w-full text-base w-full"
+            >
               <option value="">All Courses</option>
             </select>
           </div>
@@ -238,12 +245,12 @@
           <thead class="bg-gray-900 text-white">
             <tr>
               <th class="p-2 w-24">Day</th>
-              <th class="p-2">09:10–10:10</th>
-              <th class="p-2">10:10–11:10</th>
+              <th class="p-2">09:10–11:10</th>
               <th class="p-2">11:10–12:10</th>
               <th class="p-2">12:10–01:10</th>
               <th class="p-2">01:50–02:50</th>
-              <th class="p-2">02:50–04:50</th>
+              <th class="p-2">02:50–03:50</th>
+              <th class="p-2">03:50–04:50</th>
             </tr>
           </thead>
           <tbody id="timetable"></tbody>
@@ -259,15 +266,13 @@
       </section>
 
       <!-- Attendance Planning Table -->
-      <section class="bg-white rounded-2xl shadow p-4 space-y-4 overflow-hidden">
-        <h2 class="text-xl font-semibold">
-          📋 Attendance Planning
-        </h2>
+      <section
+        class="bg-white rounded-2xl shadow p-4 space-y-4 overflow-hidden"
+      >
+        <h2 class="text-xl font-semibold">📋 Attendance Planning</h2>
         <div class="scroll-indicator">← Scroll horizontally →</div>
         <div class="overflow-x-auto -mx-4 px-4">
-          <table
-            class="w-full text-sm min-w-[640px]"
-          >
+          <table class="w-full text-sm min-w-[640px]">
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-4 py-2 text-left">Course</th>
@@ -308,7 +313,9 @@
             </p>
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1">Excluded Dates</label>
+            <label class="block text-sm font-semibold mb-1"
+              >Excluded Dates</label
+            >
             <textarea
               id="excludedDates"
               class="w-full border rounded-md px-2 py-1 text-sm"
@@ -333,83 +340,84 @@
       const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
       const EXCLUDE_CODES = new Set(["LIBRARY", "ADVISORY"]);
       const COURSES = {
-        MCA501C: "Programming Concepts in C/C++ — Dr. Snowber Mushtaq",
+        MCA501C: "Programming Concepts in C/C++ — Dr. Shabana Nargis",
         MCA502C: "Database Management System — Dr. Syed Mohsin Saif",
         MCA503C: "Discrete Mathematics — Dr. Muzaffar Rasool Bhat",
         MCA504C: "Computer Organization & Architecture — Dr. Kaisar Javeed",
-        MCA511E: "Digital Electronics — Dr. Kaisar Javeed",
-        MCA526E: "Web Technologies — Dr. Zubair Jeelani",
-        MCA541A: "Information & Communications Technology — Dr. Kaisar Javeed",
+        MCA511E: "Digital Electronics — Dr. Naira Shah",
+        MCA526E: "Web Technologies — Dr. Mujtaba Ashraf",
+        MCA541A: "Information & Communications Technology — Mr. Mohd Asif",
         "MCA501C-LAB": "Programming in C/C++ (Lab)",
         "MCA502C-LAB": "Database Management System (Lab)",
         "MCA526E-LAB": "Web Technologies (Lab)",
         LIBRARY: "Library Session",
         ADVISORY: "Advisory Session",
       };
+
       const TIMETABLE_DATA = {
         Mon: [
-          "MCA504C",
-          "LIBRARY",
-          "MCA526E",
-          "MCA502C",
-          "MCA503C",
-          "MCA502C-LAB",
+          "MCA502C-LAB", // 9:10–11:10
+          "MCA526E", // 11:10–12:10
+          "ADVISORY", // 12:10–01:10
+          "MCA503C", // 01:50–02:50
+          "MCA504C", // 02:50–03:50
+          "LIBRARY", // 03:50–04:50
         ],
         Tue: [
-          "MCA511E",
-          "MCA502C",
-          "ADVISORY",
-          "MCA503C",
-          "MCA501C",
-          "MCA501C-LAB",
+          "MCA502C-LAB", // 9:10–11:10
+          "MCA511E", // 11:10–12:10
+          "MCA503C", // 12:10–01:10
+          "MCA502C", // 01:50–02:50
+          "ADVISORY", // 02:50–03:50
+          "MCA501C", // 03:50–04:50
         ],
         Wed: [
-          "MCA511E",
-          "ADVISORY",
-          "MCA504C",
-          "MCA503C",
-          "MCA501C",
-          "MCA502C-LAB",
+          "MCA526E-LAB", // 9:10–11:10
+          "MCA502C", // 11:10–12:10
+          "MCA503C", // 12:10–01:10
+          "MCA541A", // 01:50–02:50
+          "MCA504C", // 02:50–03:50
+          "MCA502C", // 03:50–04:50
         ],
         Thu: [
-          "MCA526E",
-          "MCA504C",
-          "MCA502C",
-          "MCA541A",
-          "LIBRARY",
-          "MCA501C-LAB",
+          "MCA501C-LAB", // 9:10–11:10
+          "MCA511E", // 11:10–12:10
+          "MCA541A", // 12:10–01:10
+          "ADVISORY", // 01:50–02:50
+          "MCA501C", // 02:50–03:50
+          "MCA504C", // 03:50–04:50
         ],
         Fri: [
-          "MCA541A",
-          "MCA511E",
-          "MCA504C",
-          "MCA503C",
-          "MCA501C",
-          "MCA526E-LAB",
+          "MCA501C-LAB", // 9:10–11:10
+          "MCA504C", // 11:10–12:10
+          "MCA503C", // 12:10–01:10
+          "MCA501C", // 01:50–02:50
+          "MCA526E", // 02:50–03:50
+          "MCA511E", // 03:50–04:50
         ],
       };
 
       const computeCourseFrequency = () => {
-  const frequency = {};
-  
-  collectCourseCodes().forEach(code => {
-    frequency[code] = {
-      slots: [],
-      perWeek: 0
-    };
-    
-    DAYS.forEach(day => {
-      TIMETABLE_DATA[day].forEach((courseCode, slotIndex) => {
-        if (courseCode === code) {
-          frequency[code].slots.push(`${day}/${slotIndex}`);
-          frequency[code].perWeek++;
-        }
-      });
-    });
-  });
-  
-  return frequency;
-};
+        const frequency = {};
+
+        collectCourseCodes().forEach((code) => {
+          frequency[code] = {
+            slots: [],
+            perWeek: 0,
+          };
+
+          DAYS.forEach((day) => {
+            TIMETABLE_DATA[day].forEach((courseCode, slotIndex) => {
+              if (courseCode === code) {
+                frequency[code].slots.push(`${day}/${slotIndex}`);
+                frequency[code].perWeek++;
+              }
+            });
+          });
+        });
+
+        return frequency;
+      };
 
       // ===== DOM =====
       const timetableBody = document.getElementById("timetable");
@@ -469,50 +477,50 @@
 
       // ===== Render timetable =====
       function renderTimetable() {
-    const timetableBody = document.getElementById("timetable");
-    
-    if (!timetableBody) {
-        console.error('Timetable body element not found!');
-        return;
-    }
+        const timetableBody = document.getElementById("timetable");
 
-    // Clear existing content
-    timetableBody.innerHTML = '';
+        if (!timetableBody) {
+          console.error("Timetable body element not found!");
+          return;
+        }
 
-    // Create rows for each day
-    DAYS.forEach(day => {
-        // Create row
-        const row = document.createElement('tr');
-        
-        // Add day cell
-        const dayCell = document.createElement('th');
-        dayCell.className = 'p-2 text-left font-semibold';
-        dayCell.innerHTML = `${day} <div class="text-xs text-gray-400" data-date="${day}"></div>`;
-        row.appendChild(dayCell);
+        // Clear existing content
+        timetableBody.innerHTML = "";
 
-        // Add cells for each time slot
-        TIMETABLE_DATA[day].forEach((code, slotIndex) => {
-            const cell = document.createElement('td');
-            cell.className = 'cell-btn p-2 border';
-            cell.textContent = code || '—';
+        // Create rows for each day
+        DAYS.forEach((day) => {
+          // Create row
+          const row = document.createElement("tr");
+
+          // Add day cell
+          const dayCell = document.createElement("th");
+          dayCell.className = "p-2 text-left font-semibold";
+          dayCell.innerHTML = `${day} <div class="text-xs text-gray-400" data-date="${day}"></div>`;
+          row.appendChild(dayCell);
+
+          // Add cells for each time slot
+          TIMETABLE_DATA[day].forEach((code, slotIndex) => {
+            const cell = document.createElement("td");
+            cell.className = "cell-btn p-2 border";
+            cell.textContent = code || "—";
             cell.dataset.day = day;
             cell.dataset.slot = slotIndex;
             cell.dataset.code = code;
             cell.dataset.title = COURSES[code] || code;
             row.appendChild(cell);
+          });
+
+          timetableBody.appendChild(row);
         });
 
-        timetableBody.appendChild(row);
-    });
+        // Debug output
+        const cellCount = timetableBody.querySelectorAll("td[data-day]").length;
+        console.log(`Rendered ${cellCount} timetable cells`);
 
-    // Debug output
-    const cellCount = timetableBody.querySelectorAll('td[data-day]').length;
-    console.log(`Rendered ${cellCount} timetable cells`);
-    
-    if (cellCount === 0) {
-        console.error('No cells were rendered in the timetable!');
-    }
-}
+        if (cellCount === 0) {
+          console.error("No cells were rendered in the timetable!");
+        }
+      }
 
       function setState(cell, state) {
         cell.classList.remove("present", "absent");
@@ -635,9 +643,9 @@
           card.appendChild(right);
 
           // Add course name for mobile
-          const details = document.createElement('div');
-          details.className = 'text-xs text-gray-600 mt-1 sm:hidden';
-          details.textContent = COURSES[code] || '';
+          const details = document.createElement("div");
+          details.className = "text-xs text-gray-600 mt-1 sm:hidden";
+          details.textContent = COURSES[code] || "";
           left.appendChild(details);
 
           courseCards.appendChild(card);
@@ -649,43 +657,45 @@
         const { totals, att } = computeCourseTotals();
         const threshold = Number(thresholdEl.value) / 100;
         const plan = {};
-        
-        collectCourseCodes().forEach(code => {
-            const attended = att[code] || 0;
-            const total = totals[code] || 0;
-            const remaining = getRemainingClassDays(code) || 0;
-            const totalPossible = total + remaining;
 
-            // Calculate minimum classes needed
-            let minNeeded = Math.ceil(totalPossible * threshold) - attended;
-            minNeeded = Math.max(0, minNeeded);
+        collectCourseCodes().forEach((code) => {
+          const attended = att[code] || 0;
+          const total = totals[code] || 0;
+          const remaining = getRemainingClassDays(code) || 0;
+          const totalPossible = total + remaining;
 
-            // Calculate maximum classes that can be skipped
-            const maxSkippable = Math.max(0, remaining - minNeeded);
+          // Calculate minimum classes needed
+          let minNeeded = Math.ceil(totalPossible * threshold) - attended;
+          minNeeded = Math.max(0, minNeeded);
 
-            plan[code] = {
-              minNeeded,
-              maxSkippable,
-              remaining,
-              currentAttendance: total ? (attended / total * 100).toFixed(1) : 0,
-              totalPossible
-            };
-          });
+          // Calculate maximum classes that can be skipped
+          const maxSkippable = Math.max(0, remaining - minNeeded);
+
+          plan[code] = {
+            minNeeded,
+            maxSkippable,
+            remaining,
+            currentAttendance: total
+              ? ((attended / total) * 100).toFixed(1)
+              : 0,
+            totalPossible,
+          };
+        });
 
         return plan;
       }
       function updateAttendancePlan() {
-        const planningTable = document.getElementById('planningTable');
+        const planningTable = document.getElementById("planningTable");
         const plan = computeAttendancePlan();
-        
-        planningTable.innerHTML = '';
-        
+
+        planningTable.innerHTML = "";
+
         Object.entries(plan).forEach(([code, data]) => {
-            const row = document.createElement('tr');
-            
-            const nameCell = document.createElement('td');
-            nameCell.className = 'px-4 py-2';
-            nameCell.innerHTML = `
+          const row = document.createElement("tr");
+
+          const nameCell = document.createElement("td");
+          nameCell.className = "px-4 py-2";
+          nameCell.innerHTML = `
               <div class="font-medium">${code}</div>
               <div class="text-xs text-gray-500">
                 ${COURSES[code]}
@@ -695,105 +705,113 @@
                 </div>
               </div>
             `;
-            
-            const currentCell = document.createElement('td');
-            currentCell.className = 'px-4 py-2 text-center';
-            currentCell.textContent = `${data.currentAttendance}%`;
-            
-            const remainingCell = document.createElement('td');
-            remainingCell.className = 'px-4 py-2 text-center';
-            remainingCell.textContent = data.remaining;
-            
-            const minCell = document.createElement('td');
-            minCell.className = 'px-4 py-2 text-center font-medium';
-            if (data.minNeeded > 0) {
-                minCell.className += ' text-red-600';
-            }
-            minCell.textContent = data.minNeeded;
-            
-            const maxCell = document.createElement('td');
-            maxCell.className = 'px-4 py-2 text-center font-medium';
-            if (data.maxSkippable > 0) {
-                maxCell.className += ' text-green-600';
-            }
-            maxCell.textContent = data.maxSkippable;
-            
-            row.append(nameCell, currentCell, remainingCell, minCell, maxCell);
-            planningTable.appendChild(row);
+
+          const currentCell = document.createElement("td");
+          currentCell.className = "px-4 py-2 text-center";
+          currentCell.textContent = `${data.currentAttendance}%`;
+
+          const remainingCell = document.createElement("td");
+          remainingCell.className = "px-4 py-2 text-center";
+          remainingCell.textContent = data.remaining;
+
+          const minCell = document.createElement("td");
+          minCell.className = "px-4 py-2 text-center font-medium";
+          if (data.minNeeded > 0) {
+            minCell.className += " text-red-600";
+          }
+          minCell.textContent = data.minNeeded;
+
+          const maxCell = document.createElement("td");
+          maxCell.className = "px-4 py-2 text-center font-medium";
+          if (data.maxSkippable > 0) {
+            maxCell.className += " text-green-600";
+          }
+          maxCell.textContent = data.maxSkippable;
+
+          row.append(nameCell, currentCell, remainingCell, minCell, maxCell);
+          planningTable.appendChild(row);
         });
-    }
+      }
 
       function getFrequencyString(code) {
-  const frequency = computeCourseFrequency()[code];
-  return `${frequency.perWeek} classes/week`;
-}
+        const frequency = computeCourseFrequency()[code];
+        return `${frequency.perWeek} classes/week`;
+      }
 
       // ===== Semester Settings =====
       function saveSemesterSettings() {
-  const settings = {
-    endDate: document.getElementById('semesterEndDate').value,
-    excludedDates: document.getElementById('excludedDates').value
-      .split(',')
-      .map(d => d.trim())
-      .filter(d => d.length > 0)
-  };
-  
-  const errors = validateSemesterSettings(settings);
-  if (errors.length > 0) {
-    alert(`Please fix the following:\n\n${errors.join('\n')}`);
-    return false;
-  }
-  
-  localStorage.setItem('SEMESTER_SETTINGS', JSON.stringify(settings));
-  updateCourseCards();
-  return true;
-}
+        const settings = {
+          endDate: document.getElementById("semesterEndDate").value,
+          excludedDates: document
+            .getElementById("excludedDates")
+            .value.split(",")
+            .map((d) => d.trim())
+            .filter((d) => d.length > 0),
+        };
 
-function loadSemesterSettings() {
-  try {
-    const settings = JSON.parse(localStorage.getItem('SEMESTER_SETTINGS')) || {};
-    document.getElementById('semesterEndDate').value = settings.endDate || '';
-    document.getElementById('excludedDates').value = (settings.excludedDates || []).join(', ');
-    return settings;
-  } catch {
-    return { endDate: '', excludedDates: [] };
-  }
-}
+        const errors = validateSemesterSettings(settings);
+        if (errors.length > 0) {
+          alert(`Please fix the following:\n\n${errors.join("\n")}`);
+          return false;
+        }
 
-function getRemainingClassDays(code) {
-  const settings = loadSemesterSettings();
-  if (!settings.endDate) return null;
+        localStorage.setItem("SEMESTER_SETTINGS", JSON.stringify(settings));
+        updateCourseCards();
+        return true;
+      }
 
-  const endDate = parseDateLocal(settings.endDate);
-  const today = parseDateLocal(new Date());
-  const excludedDates = new Set(settings.excludedDates);
-  const courseFrequency = computeCourseFrequency()[code];
-  
-  let remainingClasses = 0;
-  let currentDate = today;
+      function loadSemesterSettings() {
+        try {
+          const settings =
+            JSON.parse(localStorage.getItem("SEMESTER_SETTINGS")) || {};
+          document.getElementById("semesterEndDate").value =
+            settings.endDate || "";
+          document.getElementById("excludedDates").value = (
+            settings.excludedDates || []
+          ).join(", ");
+          return settings;
+        } catch {
+          return { endDate: "", excludedDates: [] };
+        }
+      }
 
-  // Validate dates
-  if (endDate <= today) return 0;
+      function getRemainingClassDays(code) {
+        const settings = loadSemesterSettings();
+        if (!settings.endDate) return null;
 
-  while (currentDate <= endDate) {
-    const dayIndex = currentDate.getDay();
-    const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayIndex];
-    const dateStr = fmtDate(currentDate);
+        const endDate = parseDateLocal(settings.endDate);
+        const today = parseDateLocal(new Date());
+        const excludedDates = new Set(settings.excludedDates);
+        const courseFrequency = computeCourseFrequency()[code];
 
-    // Skip if:
-    // 1. It's a weekend (Sunday = 0, Saturday = 6)
-    // 2. It's in excluded dates
-    if (dayIndex !== 0 && dayIndex !== 6 && !excludedDates.has(dateStr)) {
-      // Count actual classes on this day based on timetable
-      const classesOnThisDay = TIMETABLE_DATA[dayName]?.filter(c => c === code).length || 0;
-      remainingClasses += classesOnThisDay;
-    }
-    
-    currentDate = addDays(currentDate, 1);
-  }
+        let remainingClasses = 0;
+        let currentDate = today;
 
-  return remainingClasses;
-}
+        // Validate dates
+        if (endDate <= today) return 0;
+
+        while (currentDate <= endDate) {
+          const dayIndex = currentDate.getDay();
+          const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+            dayIndex
+          ];
+          const dateStr = fmtDate(currentDate);
+
+          // Skip if:
+          // 1. It's a weekend (Sunday = 0, Saturday = 6)
+          // 2. It's in excluded dates
+          if (dayIndex !== 0 && dayIndex !== 6 && !excludedDates.has(dateStr)) {
+            // Count actual classes on this day based on timetable
+            const classesOnThisDay =
+              TIMETABLE_DATA[dayName]?.filter((c) => c === code).length || 0;
+            remainingClasses += classesOnThisDay;
+          }
+
+          currentDate = addDays(currentDate, 1);
+        }
+
+        return remainingClasses;
+      }
 
       // ===== Filter =====
       function populateFilter() {
@@ -875,83 +893,89 @@ function getRemainingClassDays(code) {
       document
         .getElementById("printReport")
         .addEventListener("click", () => window.print());
-      document.getElementById('updateSemester').addEventListener('click', () => {
-  saveSemesterSettings();
-  updateCourseCards(); // This will also update the planning table
-});
+      document
+        .getElementById("updateSemester")
+        .addEventListener("click", () => {
+          saveSemesterSettings();
+          updateCourseCards(); // This will also update the planning table
+        });
 
       // Add to script section
-function validateSemesterSettings(settings) {
-  const errors = [];
-  
-  // Check end date
-  if (!settings.endDate) {
-    errors.push("Semester end date is required");
-  } else {
-    const endDate = parseDateLocal(settings.endDate);
-    const today = parseDateLocal(new Date());
-    if (endDate <= today) {
-      errors.push("End date must be in the future");
-    }
-  }
-  
-  // Check excluded dates format
-  const invalidDates = settings.excludedDates.filter(d => !(/^\d{4}-\d{2}-\d{2}$/.test(d)));
-  if (invalidDates.length > 0) {
-    errors.push(`Invalid date format: ${invalidDates.join(', ')}`);
-  }
-  
-  return errors;
-}
+      function validateSemesterSettings(settings) {
+        const errors = [];
 
-// Add to init function
-(function init() {
-    // Debug check for DOM elements
-    console.log('Initializing app...');
-    const requiredElements = {
-        timetable: document.getElementById("timetable"),
-        courseCards: document.getElementById("courseCards"),
-        threshold: document.getElementById("threshold"),
-        weekPicker: document.getElementById("weekPicker")
-    };
-
-    // Check if all required elements exist
-    Object.entries(requiredElements).forEach(([name, element]) => {
-        if (!element) {
-            console.error(`Required element "${name}" not found!`);
+        // Check end date
+        if (!settings.endDate) {
+          errors.push("Semester end date is required");
+        } else {
+          const endDate = parseDateLocal(settings.endDate);
+          const today = parseDateLocal(new Date());
+          if (endDate <= today) {
+            errors.push("End date must be in the future");
+          }
         }
-    });
 
-    // Render timetable first
-    console.log('Rendering timetable...');
-    renderTimetable();
+        // Check excluded dates format
+        const invalidDates = settings.excludedDates.filter(
+          (d) => !/^\d{4}-\d{2}-\d{2}$/.test(d)
+        );
+        if (invalidDates.length > 0) {
+          errors.push(`Invalid date format: ${invalidDates.join(", ")}`);
+        }
 
-    // Wire up cell interactions
-    console.log('Setting up cell interactions...');
-    wireCells();
+        return errors;
+      }
 
-    // Initialize other components
-    console.log('Initializing other components...');
-    populateFilter();
-    
-    // Set initial week
-    const mon = getMonday(new Date());
-    weekPicker.value = fmtDate(mon);
-    
-    // Load data
-    applyWeekData(mon);
-    updateCourseCards();
-    loadSemesterSettings();
+      // Add to init function
+      (function init() {
+        // Debug check for DOM elements
+        console.log("Initializing app...");
+        const requiredElements = {
+          timetable: document.getElementById("timetable"),
+          courseCards: document.getElementById("courseCards"),
+          threshold: document.getElementById("threshold"),
+          weekPicker: document.getElementById("weekPicker"),
+        };
 
-    console.log('Initialization complete');
-})();
+        // Check if all required elements exist
+        Object.entries(requiredElements).forEach(([name, element]) => {
+          if (!element) {
+            console.error(`Required element "${name}" not found!`);
+          }
+        });
+
+        // Render timetable first
+        console.log("Rendering timetable...");
+        renderTimetable();
+
+        // Wire up cell interactions
+        console.log("Setting up cell interactions...");
+        wireCells();
+
+        // Initialize other components
+        console.log("Initializing other components...");
+        populateFilter();
+
+        // Set initial week
+        const mon = getMonday(new Date());
+        weekPicker.value = fmtDate(mon);
+
+        // Load data
+        applyWeekData(mon);
+        updateCourseCards();
+        loadSemesterSettings();
+
+        console.log("Initialization complete");
+      })();
 
       // Add this debug check right after renderTimetable() is called in init()
-// Add after renderTimetable() in init function
-const cellCount = document.querySelectorAll('#timetable td[data-day]').length;
-if (cellCount === 0) {
-  console.error('Timetable failed to render - no cells found');
-}
+      // Add after renderTimetable() in init function
+      const cellCount = document.querySelectorAll(
+        "#timetable td[data-day]"
+      ).length;
+      if (cellCount === 0) {
+        console.error("Timetable failed to render - no cells found");
+      }
     </script>
   </body>
 </html>
